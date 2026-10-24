@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UrbanFlow | Flood & Drainage Response</title>
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">UF</div>
+        <div><strong>UrbanFlow</strong><span>SMART CITY RESPONSE</span></div>
+      </div>
+      <div class="nav-label">WORKSPACE</div>
+      <button class="nav-item active" data-scroll="overview"><span>▦</span> Overview</button>
+      <button class="nav-item" data-scroll="map-section"><span>⌖</span> Flood map</button>
+      <button class="nav-item" data-scroll="report-section"><span>＋</span> Report incident</button>
+      <button class="nav-item" data-scroll="tasks-section"><span>☷</span> Municipal tasks</button>
+      <div class="sidebar-bottom">
+        <div class="demo-note"><span class="dot"></span><div><strong>Prototype mode</strong><small>Sample data is clearly marked</small></div></div>
+        <div class="sidebar-foot">Built for Smart Cities & CivilTech<br>Hackathon Innovation Conclave</div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">SMART CITIES / CIVILTECH</div>
+          <h1>Flood & Drainage Response</h1>
+          <p class="subtitle">From scattered reports to coordinated action.</p>
+        </div>
+        <div class="top-actions">
+          <span class="demo-pill"><span class="dot"></span> DEMO DATA</span>
+          <button class="primary-btn" data-scroll="report-section">＋ New report</button>
+        </div>
+      </header>
+
+      <section id="overview">
+        <div class="section-heading">
+          <div><h2>Response overview</h2><p>Monitor reported incidents and organise the next response.</p></div>
+          <span class="updated" id="last-updated">Loading dashboard…</span>
+        </div>
+        <div class="stats-grid">
+          <article class="stat-card"><div class="stat-top"><span>Total incidents</span><span class="stat-icon teal">▦</span></div><div class="stat-number" id="stat-total">—</div><div class="stat-foot">All submitted reports</div></article>
+          <article class="stat-card"><div class="stat-top"><span>Active incidents</span><span class="stat-icon amber">◷</span></div><div class="stat-number" id="stat-active">—</div><div class="stat-foot">Awaiting full resolution</div></article>
+          <article class="stat-card"><div class="stat-top"><span>High priority</span><span class="stat-icon red">!</span></div><div class="stat-number" id="stat-high">—</div><div class="stat-foot">Suggested inspection focus</div></article>
+          <article class="stat-card"><div class="stat-top"><span>Resolved</span><span class="stat-icon green">✓</span></div><div class="stat-number" id="stat-resolved">—</div><div class="stat-foot">Marked resolved in prototype</div></article>
+        </div>
+      </section>
+
+      <section class="content-grid" id="map-section">
+        <article class="panel map-panel">
+          <div class="panel-heading">
+            <div><h2>Incident map</h2><p>Map markers are based on the coordinates saved with each report.</p></div>
+            <div class="map-legend"><span><i class="legend-dot high"></i> High</span><span><i class="legend-dot medium"></i> Medium</span><span><i class="legend-dot low"></i> Low</span></div>
+          </div>
+          <div id="map" aria-label="Map showing flood and drainage incidents"></div>
+          <div class="map-disclaimer">Demo coordinates only — verify locations before real-world use.</div>
+        </article>
+        <article class="panel priority-panel">
+          <div class="panel-heading"><div><h2>Priority queue</h2><p>Highest illustrative score first</p></div><span class="mini-badge">RULE-BASED</span></div>
+          <div id="priority-list" class="priority-list"></div>
+          <div class="score-explainer"><strong>How is priority calculated?</strong><p>Severity (0–5) + repeat reports (0–3) + road impact (0–2) = score out of 10. This example rule supports review; it does not replace on-site verification.</p></div>
+        </article>
+      </section>
+
+      <section class="panel report-panel" id="report-section">
+        <div class="panel-heading">
+          <div><h2>Report an incident</h2><p>Enter a flood or drainage issue. New reports are saved to the local database.</p></div><span class="step-tag">01 / REPORT</span>
+        </div>
+        <form id="incident-form">
+          <div class="form-grid">
+            <label>Incident title<input name="title" required maxlength="120" placeholder="e.g. Waterlogging near main road"></label>
+            <label>Issue category<select name="category" required><option value="Flooding">Flooding / waterlogging</option><option value="Blocked Drain">Blocked drain</option><option value="Drain Damage">Damaged drain</option><option value="Other">Other</option></select></label>
+            <label class="wide">Location description<input name="location" required maxlength="160" placeholder="Street, landmark or area"></label>
+            <label>Latitude (optional)<input name="lat" type="number" step="any" placeholder="e.g. 15.8281"></label>
+            <label>Longitude (optional)<input name="lng" type="number" step="any" placeholder="e.g. 78.0373"></label>
+            <label>Severity<select name="severity"><option value="1">1 — Minor</option><option value="2">2 — Low</option><option value="3" selected>3 — Moderate</option><option value="4">4 — Severe</option><option value="5">5 — Critical</option></select></label>
+            <label>Repeat reports<select name="repeat_reports"><option value="0">0 — First report</option><option value="1">1 — One repeat</option><option value="2">2 — Two repeats</option><option value="3">3 — Three or more repeats</option></select></label>
+            <label>Road / public impact<select name="impact"><option value="0">0 — Limited impact</option><option value="1" selected>1 — Moderate impact</option><option value="2">2 — Major road / service impact</option></select></label>
+            <label class="wide">Description<textarea name="description" rows="3" maxlength="1000" placeholder="Describe what you observed. Avoid entering private personal information."></textarea></label>
+          </div>
+          <div class="form-bottom"><p>Tip: map markers require both latitude and longitude. Reports without coordinates remain in the task list.</p><button class="primary-btn" type="submit" id="submit-btn">Submit report <span>→</span></button></div>
+          <div class="form-message" id="form-message" role="status"></div>
+        </form>
+      </section>
+
+      <section class="panel tasks-panel" id="tasks-section">
+        <div class="panel-heading task-heading">
+          <div><h2>Municipal task tracking</h2><p>Assign ownership and move each report through the response workflow.</p></div>
+          <div class="filter-wrap"><label for="status-filter">Filter</label><select id="status-filter"><option value="All">All statuses</option><option>Reported</option><option>Assigned</option><option>In Progress</option><option>Resolved</option></select></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Incident</th><th>Priority</th><th>Assigned worker</th><th>Status</th><th>Update</th></tr></thead>
+            <tbody id="task-table"><tr><td colspan="5" class="empty-state">Loading incidents…</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+      <footer>UrbanFlow prototype · Sample data only · Municipal teams must verify reports and determine actual response.</footer>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" role="status"></div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
